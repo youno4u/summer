@@ -6,11 +6,11 @@
     <title>영적 전쟁: 내 생각의 CCTV</title>
     <style>
         :root {
-            --primary: #1e3a8a;
             --background: #0f172a;
             --surface: #1e293b;
             --text: #f8fafc;
             --accent: #ef4444;
+            --primary: #38bdf8;
         }
         body {
             font-family: 'Malgun Gothic', sans-serif;
@@ -22,57 +22,59 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            box-sizing: border-box;
         }
         .container {
             width: 100%;
-            max-width: 450px;
+            max-width: 400px;
             background: var(--surface);
-            padding: 25px;
+            padding: 30px 25px;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             border: 1px solid #334155;
         }
         h2 {
             text-align: center;
-            color: var(--text);
-            margin-bottom: 5px;
-            font-size: 1.5rem;
-        }
-        .subtitle {
-            text-align: center;
-            color: #94a3b8;
-            font-size: 0.9rem;
             margin-bottom: 25px;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
         }
         .form-group {
             margin-bottom: 20px;
         }
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: bold;
             color: #cbd5e1;
+            font-size: 1.05rem;
+            text-align: center;
         }
-        input, select, textarea {
+        input, textarea {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             box-sizing: border-box;
             background-color: var(--background);
             border: 1px solid #475569;
-            border-radius: 6px;
+            border-radius: 8px;
             color: white;
-            font-size: 1rem;
+            font-size: 1.05rem;
+            text-align: center;
         }
-        input:focus, select:focus, textarea:focus {
+        textarea {
+            text-align: left;
+            resize: none;
+        }
+        input:focus, textarea:focus {
             outline: none;
             border-color: var(--accent);
         }
         button {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             background-color: var(--accent);
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             color: white;
             font-weight: bold;
             font-size: 1.1rem;
@@ -83,27 +85,50 @@
             background-color: #dc2626;
         }
         .hidden { display: none; }
-        .log-list {
-            margin-top: 25px;
-            border-top: 1px solid #475569;
-            padding-top: 20px;
+        
+        /* 내 이름 상단 표시 스타일 */
+        .user-header {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
         }
-        .log-item {
+        
+        /* 탭(주차) 스타일 */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #475569;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            cursor: pointer;
+            color: #94a3b8;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .log-box {
+            margin-top: 25px;
             background: rgba(15, 23, 42, 0.6);
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
             border-left: 4px solid var(--accent);
+            font-size: 1rem;
+            line-height: 1.5;
         }
         .log-date {
             font-size: 0.8rem;
             color: #94a3b8;
-            margin-bottom: 4px;
-        }
-        .log-type {
-            font-weight: bold;
-            color: #fca5a5;
-            font-size: 0.9rem;
+            margin-bottom: 6px;
         }
     </style>
 </head>
@@ -113,47 +138,41 @@
     <!-- 1단계: 로그인 화면 -->
     <div id="login-section">
         <h2>영적 전쟁: 내 생각의 CCTV</h2>
-        <div class="subtitle">모든 생각을 사로잡아 그리스도께 복종하라</div>
         <div class="form-group">
             <label for="username">이름을 입력하세요</label>
-            <input type="text" id="username" placeholder="이름 입력">
+            <input type="text" id="username" placeholder="이름 입력" autocomplete="off">
         </div>
-        <button onclick="login()">로그인 및 접속</button>
+        <button onclick="login()">로그인</button>
     </div>
 
     <!-- 2단계: 메인 기록 화면 -->
     <div id="main-section" class="hidden">
-        <h2><span id="user-display"></span> 청소년의 영적 상태</h2>
-        <div class="subtitle">오늘 내 마음에 틈타는 진짜 귀신(마귀의 생각)을 적으라</div>
+        <!-- 상단에 이름만 고정 노출 -->
+        <div class="user-header">👤 <span id="user-display"></span></div>
         
-        <div class="form-group">
-            <label for="ghost-type">어떤 통로로 마귀가 공작을 펼치나요?</label>
-            <select id="ghost-type">
-                <option value="미움/분노 (모두 다 싫어)">미움/분노 (모두 다 싫어)</option>
-                <option value="돈/성공 집착 (돈이 최고야)">돈/성공 집착 (돈이 최고야)</option>
-                <option value="외모/명품/비교 (내가 제일 예뻐야 해)">외모/명품/비교 (내가 제일 예뻐야 해)</option>
-                <option value="음란/미디어 중독">음란/미디어 중독</option>
-                <option value="미래 학업 두려움/염려">미래 학업 두려움/염려</option>
-            </select>
+        <!-- 주차 선택 탭 -->
+        <div class="tabs">
+            <div class="tab active" id="tab-1" onclick="selectWeek(1)">1주차</div>
+            <div class="tab" id="tab-2" onclick="selectWeek(2)">2주차</div>
+            <div class="tab" id="tab-3" onclick="selectWeek(3)">3주차</div>
+            <div class="tab" id="tab-4" onclick="selectWeek(4)">4주차</div>
         </div>
 
         <div class="form-group">
-            <label for="ghost-detail">내 머릿속에 들어오는 구체적인 마귀의 속삭임은?</label>
-            <textarea id="ghost-detail" rows="4" placeholder="예: '공부 안 하면 네 인생 끝이야'라는 두려움이 밀려옵니다."></textarea>
+            <label for="ghost-detail">지금 내 머릿속에 있는 귀신은 무엇인가?</label>
+            <textarea id="ghost-detail" rows="5" placeholder="솔직하게 마귀가 주는 생각을 적어보세요."></textarea>
         </div>
 
-        <button onclick="saveLog()">내 생각 영적 포획하기</button>
+        <button onclick="saveLog()">영적 포획하기</button>
 
-        <!-- 누적 기록 확인 확인 -->
-        <div class="log-list">
-            <label>수련회까지 모인 나의 영적 전투 기록</label>
-            <div id="log-container"></div>
-        </div>
+        <!-- 오늘 적은 내용 확인 박스 -->
+        <div id="log-container"></div>
     </div>
 </div>
 
 <script>
     let currentUser = "";
+    let currentWeek = 1;
 
     function login() {
         const nameInput = document.getElementById("username").value.trim();
@@ -165,57 +184,75 @@
         document.getElementById("user-display").innerText = currentUser;
         document.getElementById("login-section").classList.add("hidden");
         document.getElementById("main-section").classList.remove("hidden");
+        
+        // 로그인 시 기본으로 1주차 활성화
+        selectWeek(1); 
+    }
+
+    function selectWeek(week) {
+        currentWeek = week;
+        
+        // 탭 디자인 변경 (선택된 주차에 파란색 밑줄)
+        for(let i=1; i<=4; i++) {
+            document.getElementById("tab-" + i).classList.remove("active");
+        }
+        document.getElementById("tab-" + week).classList.add("active");
+
+        // 다른 주차로 넘어갈 때 텍스트 입력창 비우기
+        document.getElementById("ghost-detail").value = "";
+        
+        // 선택한 주차의 기록 불러오기
         loadLogs();
     }
 
     function saveLog() {
-        const type = document.getElementById("ghost-type").value;
         const detail = document.getElementById("ghost-detail").value.trim();
         
         if(!detail) {
-            alert("마귀가 주는 구체적인 생각을 적어주세요!");
+            alert("내용을 입력해주세요!");
             return;
         }
 
-        const logContainer = JSON.parse(localStorage.getItem("spiritual_logs") || "[]");
+        // 주차별 데이터를 저장하기 위해 새로운 키(spiritual_logs_weeks) 사용
+        const logContainer = JSON.parse(localStorage.getItem("spiritual_logs_weeks") || "[]");
+        
+        // 현재 유저의 '현재 선택된 주차' 기록만 제외하고 남김 (덮어쓰기를 위함)
+        const filteredContainer = logContainer.filter(log => !(log.user === currentUser && log.week === currentWeek));
+
         const newLog = {
             user: currentUser,
-            type: type,
+            week: currentWeek,
             detail: detail,
             date: new Date().toLocaleString('ko-KR')
         };
 
-        logContainer.push(newLog);
-        localStorage.setItem("spiritual_logs", JSON.stringify(logContainer));
+        filteredContainer.push(newLog);
+        localStorage.setItem("spiritual_logs_weeks", JSON.stringify(filteredContainer));
         
         document.getElementById("ghost-detail").value = "";
-        alert("생각을 사로잡아 보관함에 넣었습니다!");
+        alert(currentWeek + "주차 생각을 성공적으로 포획하여 보관했습니다!");
         loadLogs();
     }
 
     function loadLogs() {
-        const logContainer = JSON.parse(localStorage.getItem("spiritual_logs") || "[]");
+        const logContainer = JSON.parse(localStorage.getItem("spiritual_logs_weeks") || "[]");
         const containerHtml = document.getElementById("log-container");
         containerHtml.innerHTML = "";
 
-        // 현재 로그인한 사용자의 데이터만 필터링
-        const userLogs = logContainer.filter(log => log.user === currentUser).reverse();
+        // 현재 로그인한 사용자의 '선택된 주차' 기록만 찾기
+        const userLog = logContainer.find(log => log.user === currentUser && log.week === currentWeek);
 
-        if(userLogs.length === 0) {
-            containerHtml.innerHTML = "<div style='color:#64748b; font-size:0.9rem; text-align:center; padding:10px;'>기록된 영적 진이 없습니다.</div>";
-            return;
-        }
+        if(!userLog) return;
 
-        userLogs.forEach(log => {
-            const item = document.createElement("div");
-            item.className = "log-item";
-            item.innerHTML = `
-                <div class="log-date">${log.date}</div>
-                <div class="log-type">[${log.type}]</div>
-                <div style="margin-top:5px; font-size:0.95rem;">${log.detail}</div>
-            `;
-            containerHtml.appendChild(item);
-        });
+        // 기록이 있으면 화면 하단에 표시
+        const item = document.createElement("div");
+        item.className = "log-box";
+        item.innerHTML = `
+            <div class="log-date">포획 시간: ${userLog.date}</div>
+            <div><strong>${currentWeek}주차에 내가 포획한 귀신:</strong></div>
+            <div style="margin-top:8px; color:#fca5a5;">${userLog.detail}</div>
+        `;
+        containerHtml.appendChild(item);
     }
 </script>
 </body>
