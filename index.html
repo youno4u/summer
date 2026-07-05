@@ -93,27 +93,8 @@
             font-weight: bold;
             color: var(--primary);
             margin-bottom: 20px;
-        }
-        
-        /* 탭(주차) 스타일 */
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #475569;
-        }
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 10px 0;
-            cursor: pointer;
-            color: #94a3b8;
-            font-weight: bold;
-            font-size: 0.95rem;
-            transition: 0.3s;
-        }
-        .tab.active {
-            color: var(--primary);
-            border-bottom: 3px solid var(--primary);
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #475569;
         }
 
         .log-box {
@@ -149,18 +130,10 @@
     <div id="main-section" class="hidden">
         <!-- 상단에 이름만 고정 노출 -->
         <div class="user-header">👤 <span id="user-display"></span></div>
-        
-        <!-- 주차 선택 탭 -->
-        <div class="tabs">
-            <div class="tab active" id="tab-1" onclick="selectWeek(1)">1주차</div>
-            <div class="tab" id="tab-2" onclick="selectWeek(2)">2주차</div>
-            <div class="tab" id="tab-3" onclick="selectWeek(3)">3주차</div>
-            <div class="tab" id="tab-4" onclick="selectWeek(4)">4주차</div>
-        </div>
 
         <div class="form-group">
             <label for="ghost-detail">지금 내 머릿속에 있는 귀신은 무엇인가?</label>
-            <textarea id="ghost-detail" rows="5" placeholder="솔직하게 마귀가 주는 생각을 적어보세요."></textarea>
+            <textarea id="ghost-detail" rows="5" placeholder="예: '친구보다 시험 못 보면 난 패배자야'라는 두려움, 자꾸 스마트폰을 보고 싶은 유혹 등 마귀가 주는 생각을 솔직하게 적어보세요."></textarea>
         </div>
 
         <button onclick="saveLog()">영적 포획하기</button>
@@ -172,7 +145,6 @@
 
 <script>
     let currentUser = "";
-    let currentWeek = 1;
 
     function login() {
         const nameInput = document.getElementById("username").value.trim();
@@ -184,24 +156,6 @@
         document.getElementById("user-display").innerText = currentUser;
         document.getElementById("login-section").classList.add("hidden");
         document.getElementById("main-section").classList.remove("hidden");
-        
-        // 로그인 시 기본으로 1주차 활성화
-        selectWeek(1); 
-    }
-
-    function selectWeek(week) {
-        currentWeek = week;
-        
-        // 탭 디자인 변경 (선택된 주차에 파란색 밑줄)
-        for(let i=1; i<=4; i++) {
-            document.getElementById("tab-" + i).classList.remove("active");
-        }
-        document.getElementById("tab-" + week).classList.add("active");
-
-        // 다른 주차로 넘어갈 때 텍스트 입력창 비우기
-        document.getElementById("ghost-detail").value = "";
-        
-        // 선택한 주차의 기록 불러오기
         loadLogs();
     }
 
@@ -213,43 +167,39 @@
             return;
         }
 
-        // 주차별 데이터를 저장하기 위해 새로운 키(spiritual_logs_weeks) 사용
-        const logContainer = JSON.parse(localStorage.getItem("spiritual_logs_weeks") || "[]");
+        const logContainer = JSON.parse(localStorage.getItem("spiritual_logs_final") || "[]");
         
-        // 현재 유저의 '현재 선택된 주차' 기록만 제외하고 남김 (덮어쓰기를 위함)
-        const filteredContainer = logContainer.filter(log => !(log.user === currentUser && log.week === currentWeek));
+        // 기존에 이 이름으로 적었던 기록이 있다면 지우고 최신 내용으로 1개만 유지
+        const filteredContainer = logContainer.filter(log => log.user !== currentUser);
 
         const newLog = {
             user: currentUser,
-            week: currentWeek,
             detail: detail,
             date: new Date().toLocaleString('ko-KR')
         };
 
         filteredContainer.push(newLog);
-        localStorage.setItem("spiritual_logs_weeks", JSON.stringify(filteredContainer));
+        localStorage.setItem("spiritual_logs_final", JSON.stringify(filteredContainer));
         
         document.getElementById("ghost-detail").value = "";
-        alert(currentWeek + "주차 생각을 성공적으로 포획하여 보관했습니다!");
+        alert("생각을 성공적으로 포획하여 보관했습니다!");
         loadLogs();
     }
 
     function loadLogs() {
-        const logContainer = JSON.parse(localStorage.getItem("spiritual_logs_weeks") || "[]");
+        const logContainer = JSON.parse(localStorage.getItem("spiritual_logs_final") || "[]");
         const containerHtml = document.getElementById("log-container");
         containerHtml.innerHTML = "";
 
-        // 현재 로그인한 사용자의 '선택된 주차' 기록만 찾기
-        const userLog = logContainer.find(log => log.user === currentUser && log.week === currentWeek);
+        const userLog = logContainer.find(log => log.user === currentUser);
 
         if(!userLog) return;
 
-        // 기록이 있으면 화면 하단에 표시
         const item = document.createElement("div");
         item.className = "log-box";
         item.innerHTML = `
             <div class="log-date">포획 시간: ${userLog.date}</div>
-            <div><strong>${currentWeek}주차에 내가 포획한 귀신:</strong></div>
+            <div><strong>내가 포획한 귀신의 실체:</strong></div>
             <div style="margin-top:8px; color:#fca5a5;">${userLog.detail}</div>
         `;
         containerHtml.appendChild(item);
