@@ -9,7 +9,8 @@
             --background: #0f172a;
             --surface: #1e293b;
             --text: #f8fafc;
-            --accent: #ef4444;
+            --accent-w1: #ef4444;
+            --accent-w2: #eab308;
             --primary: #38bdf8;
         }
         body {
@@ -33,118 +34,83 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             border: 1px solid #334155;
         }
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            font-size: 1.4rem;
-            letter-spacing: -0.5px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #cbd5e1;
-            font-size: 1.05rem;
-            text-align: center;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 14px;
-            box-sizing: border-box;
-            background-color: var(--background);
-            border: 1px solid #475569;
-            border-radius: 8px;
-            color: white;
-            font-size: 1.05rem;
-            text-align: center;
-        }
-        textarea {
-            text-align: left;
-            resize: none;
-        }
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-        button {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--accent);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        button:hover {
-            background-color: #dc2626;
-        }
+        h2 { text-align: center; margin-bottom: 25px; font-size: 1.4rem; letter-spacing: -0.5px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 10px; font-weight: bold; color: #cbd5e1; font-size: 1.05rem; text-align: center; line-height: 1.4; }
+        input, textarea { width: 100%; padding: 14px; box-sizing: border-box; background-color: var(--background); border: 1px solid #475569; border-radius: 8px; color: white; font-size: 1.05rem; text-align: center; }
+        textarea { text-align: left; resize: none; }
+        input:focus, textarea:focus { outline: none; border-color: var(--primary); }
+        button { width: 100%; padding: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: background 0.2s; }
         .hidden { display: none; }
         
-        /* 내 이름 상단 표시 스타일 */
-        .user-header {
-            text-align: center;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px dashed #475569;
-        }
+        .user-header { text-align: center; font-size: 1.3rem; font-weight: bold; color: var(--primary); margin-bottom: 20px; }
 
-        .log-box {
-            margin-top: 25px;
-            background: rgba(15, 23, 42, 0.6);
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid var(--accent);
-            font-size: 1rem;
-            line-height: 1.5;
-        }
-        .log-date {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            margin-bottom: 6px;
-        }
+        .tabs { display: flex; margin-bottom: 25px; background: #0f172a; border-radius: 8px; overflow: hidden; border: 1px solid #475569; }
+        .tab { flex: 1; text-align: center; padding: 12px 0; cursor: pointer; color: #94a3b8; font-weight: bold; font-size: 0.95rem; transition: all 0.3s ease; }
+        .tab.active-w1 { color: white; background-color: var(--accent-w1); }
+        .tab.active-w2 { color: #1e293b; background-color: var(--accent-w2); }
+
+        .log-box { margin-top: 25px; background: rgba(15, 23, 42, 0.6); padding: 15px; border-radius: 8px; font-size: 1rem; line-height: 1.5; word-break: break-all; }
+        .log-date { font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- 1단계: 로그인 화면 -->
     <div id="login-section">
         <h2>영적 전쟁: 내 생각의 CCTV</h2>
         <div class="form-group">
             <label for="username">이름을 입력하세요</label>
             <input type="text" id="username" placeholder="이름 입력" autocomplete="off">
         </div>
-        <button onclick="login()">로그인</button>
+        <button style="background-color: var(--primary);" onclick="login()">접속하기</button>
     </div>
 
-    <!-- 2단계: 메인 기록 화면 -->
     <div id="main-section" class="hidden">
-        <!-- 상단에 이름만 고정 노출 -->
         <div class="user-header">👤 <span id="user-display"></span></div>
 
-        <div class="form-group">
-            <label for="ghost-detail">지금 내 머릿속에 있는 귀신은 무엇인가?</label>
-            <textarea id="ghost-detail" rows="5" placeholder="예: '친구보다 시험 못 보면 난 패배자야'라는 두려움, 자꾸 스마트폰을 보고 싶은 유혹 등 마귀가 주는 생각을 솔직하게 적어보세요."></textarea>
+        <div class="tabs">
+            <div class="tab" id="tab-1" onclick="selectWeek(1)">1주 차 (내 생각)</div>
+            <div class="tab" id="tab-2" onclick="selectWeek(2)">2주 차 (리얼 힙합)</div>
         </div>
 
-        <button onclick="saveLog()">영적 포획하기</button>
+        <div class="form-group">
+            <label id="question-label"></label>
+            <textarea id="answer-input" rows="4"></textarea>
+        </div>
 
-        <!-- 오늘 적은 내용 확인 박스 -->
+        <button id="action-btn" onclick="saveLog()"></button>
+
         <div id="log-container"></div>
     </div>
 </div>
 
 <script>
     let currentUser = "";
+    let currentWeek = 2; // 2주 차 탭이 기본으로 열림
+
+    const weekConfig = {
+        1: {
+            storageKey: "spiritual_logs_final",
+            question: "지금 내 머릿속에 있는 귀신은 무엇인가?",
+            placeholder: "예: '친구보다 시험 못 보면 난 패배자야'라는 두려움 등",
+            btnText: "영적 포획하기",
+            btnColor: "var(--accent-w1)",
+            resultTitle: "내가 포획한 귀신의 실체 👻",
+            resultColor: "#fca5a5",
+            tabClass: "active-w1"
+        },
+        2: {
+            storageKey: "spiritual_logs_week2",
+            question: "학교/학원에서 예수님을 어떻게 자랑할 것인가?<br>(나만의 영적 펀치라인 쓰기)",
+            placeholder: "예: 세상이 날 비웃어도 내 진짜 주인은 Jesus! / 급식실 기도, 눈치 안 보고 내 믿음을 증명해!",
+            btnText: "진짜 힙합 선포하기 🎤",
+            btnColor: "var(--accent-w2)",
+            resultTitle: "나의 리얼 힙합 펀치라인 💥",
+            resultColor: "#fef08a",
+            tabClass: "active-w2"
+        }
+    };
 
     function login() {
         const nameInput = document.getElementById("username").value.trim();
@@ -156,51 +122,75 @@
         document.getElementById("user-display").innerText = currentUser;
         document.getElementById("login-section").classList.add("hidden");
         document.getElementById("main-section").classList.remove("hidden");
+        
+        selectWeek(currentWeek);
+    }
+
+    function selectWeek(week) {
+        currentWeek = week;
+        const config = weekConfig[week];
+
+        document.getElementById("tab-1").className = "tab";
+        document.getElementById("tab-2").className = "tab";
+        document.getElementById("tab-" + week).classList.add(config.tabClass);
+
+        document.getElementById("question-label").innerHTML = config.question;
+        document.getElementById("answer-input").placeholder = config.placeholder;
+        document.getElementById("answer-input").value = "";
+        
+        const actionBtn = document.getElementById("action-btn");
+        actionBtn.innerText = config.btnText;
+        actionBtn.style.backgroundColor = config.btnColor;
+        actionBtn.style.color = week === 2 ? "#1e293b" : "white"; 
+
         loadLogs();
     }
 
     function saveLog() {
-        const detail = document.getElementById("ghost-detail").value.trim();
-        
+        const detail = document.getElementById("answer-input").value.trim();
         if(!detail) {
             alert("내용을 입력해주세요!");
             return;
         }
 
-        const logContainer = JSON.parse(localStorage.getItem("spiritual_logs_final") || "[]");
+        const config = weekConfig[currentWeek];
+        const logContainer = JSON.parse(localStorage.getItem(config.storageKey) || "[]");
         
-        // 기존에 이 이름으로 적었던 기록이 있다면 지우고 최신 내용으로 1개만 유지
         const filteredContainer = logContainer.filter(log => log.user !== currentUser);
-
         const newLog = {
             user: currentUser,
             detail: detail,
             date: new Date().toLocaleString('ko-KR')
         };
-
-        filteredContainer.push(newLog);
-        localStorage.setItem("spiritual_logs_final", JSON.stringify(filteredContainer));
         
-        document.getElementById("ghost-detail").value = "";
-        alert("생각을 성공적으로 포획하여 보관했습니다!");
+        filteredContainer.push(newLog);
+        localStorage.setItem(config.storageKey, JSON.stringify(filteredContainer));
+        
+        document.getElementById("answer-input").value = "";
+        alert(currentWeek === 2 ? "영적 펀치라인 장착 완료! 세상에 플렉스 하세요!" : "생각을 포획했습니다!");
         loadLogs();
     }
 
     function loadLogs() {
-        const logContainer = JSON.parse(localStorage.getItem("spiritual_logs_final") || "[]");
+        const config = weekConfig[currentWeek];
+        const logContainer = JSON.parse(localStorage.getItem(config.storageKey) || "[]");
         const containerHtml = document.getElementById("log-container");
         containerHtml.innerHTML = "";
 
         const userLog = logContainer.find(log => log.user === currentUser);
 
-        if(!userLog) return;
+        if(!userLog) {
+            containerHtml.innerHTML = `<div style='text-align:center; color:#64748b; margin-top:20px;'>아직 등록된 내용이 없습니다.</div>`;
+            return;
+        }
 
         const item = document.createElement("div");
         item.className = "log-box";
+        item.style.borderLeftColor = config.btnColor;
         item.innerHTML = `
-            <div class="log-date">포획 시간: ${userLog.date}</div>
-            <div><strong>내가 포획한 귀신의 실체:</strong></div>
-            <div style="margin-top:8px; color:#fca5a5;">${userLog.detail}</div>
+            <div class="log-date">선포 시간: ${userLog.date}</div>
+            <div><strong>${config.resultTitle}</strong></div>
+            <div style="margin-top:10px; font-size: 1.1rem; font-weight: bold; color:${config.resultColor};">${userLog.detail}</div>
         `;
         containerHtml.appendChild(item);
     }
