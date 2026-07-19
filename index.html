@@ -11,6 +11,7 @@
             --text: #f8fafc;
             --accent-w1: #ef4444;
             --accent-w2: #eab308;
+            --accent-w3: #8b5cf6; /* 3주 차 컬러: 보라색 */
             --primary: #38bdf8;
         }
         body {
@@ -38,20 +39,26 @@
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 10px; font-weight: bold; color: #cbd5e1; font-size: 1.05rem; text-align: center; line-height: 1.4; }
         input, textarea { width: 100%; padding: 14px; box-sizing: border-box; background-color: var(--background); border: 1px solid #475569; border-radius: 8px; color: white; font-size: 1.05rem; text-align: center; }
-        textarea { text-align: left; resize: none; }
+        textarea { text-align: left; resize: none; margin-bottom: 10px; }
         input:focus, textarea:focus { outline: none; border-color: var(--primary); }
-        button { width: 100%; padding: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: background 0.2s; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: transform 0.1s; }
+        button:active { transform: scale(0.98); }
         .hidden { display: none; }
         
         .user-header { text-align: center; font-size: 1.3rem; font-weight: bold; color: var(--primary); margin-bottom: 20px; }
 
         .tabs { display: flex; margin-bottom: 25px; background: #0f172a; border-radius: 8px; overflow: hidden; border: 1px solid #475569; }
-        .tab { flex: 1; text-align: center; padding: 12px 0; cursor: pointer; color: #94a3b8; font-weight: bold; font-size: 0.95rem; transition: all 0.3s ease; }
+        .tab { flex: 1; text-align: center; padding: 12px 0; cursor: pointer; color: #94a3b8; font-weight: bold; font-size: 0.9rem; transition: all 0.3s ease; }
         .tab.active-w1 { color: white; background-color: var(--accent-w1); }
         .tab.active-w2 { color: #1e293b; background-color: var(--accent-w2); }
+        .tab.active-w3 { color: white; background-color: var(--accent-w3); }
 
         .log-box { margin-top: 25px; background: rgba(15, 23, 42, 0.6); padding: 15px; border-radius: 8px; font-size: 1rem; line-height: 1.5; word-break: break-all; }
         .log-date { font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px; }
+        
+        /* 3주차 결과 텍스트 컬러 */
+        .logout-text { color: #94a3b8; text-decoration: line-through; margin-bottom: 10px; font-size: 0.95rem; }
+        .login-text { color: #a78bfa; font-size: 1.15rem; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -70,13 +77,13 @@
         <div class="user-header">👤 <span id="user-display"></span></div>
 
         <div class="tabs">
-            <div class="tab" id="tab-1" onclick="selectWeek(1)">1주 차 (내 생각)</div>
-            <div class="tab" id="tab-2" onclick="selectWeek(2)">2주 차 (리얼 힙합)</div>
+            <div class="tab" id="tab-1" onclick="selectWeek(1)">1주 차</div>
+            <div class="tab" id="tab-2" onclick="selectWeek(2)">2주 차</div>
+            <div class="tab" id="tab-3" onclick="selectWeek(3)">3주 차(계정전환)</div>
         </div>
 
-        <div class="form-group">
-            <label id="question-label"></label>
-            <textarea id="answer-input" rows="4"></textarea>
+        <div id="dynamic-form-group" class="form-group">
+            <!-- 자바스크립트로 주차별 질문이 들어가는 영역 -->
         </div>
 
         <button id="action-btn" onclick="saveLog()"></button>
@@ -87,28 +94,40 @@
 
 <script>
     let currentUser = "";
-    let currentWeek = 2; // 2주 차 탭이 기본으로 열림
+    let currentWeek = 3; // 3주 차 탭이 기본으로 열림
 
     const weekConfig = {
         1: {
             storageKey: "spiritual_logs_final",
-            question: "지금 내 머릿속에 있는 귀신은 무엇인가?",
-            placeholder: "예: '친구보다 시험 못 보면 난 패배자야'라는 두려움 등",
+            html: `
+                <label>지금 내 머릿속에 있는 귀신은 무엇인가?</label>
+                <textarea id="w1-input" rows="4" placeholder="예: '친구보다 시험 못 보면 난 패배자야'라는 두려움 등"></textarea>
+            `,
             btnText: "영적 포획하기",
             btnColor: "var(--accent-w1)",
-            resultTitle: "내가 포획한 귀신의 실체 👻",
-            resultColor: "#fca5a5",
-            tabClass: "active-w1"
+            resultTitle: "내가 포획한 귀신의 실체 👻"
         },
         2: {
             storageKey: "spiritual_logs_week2",
-            question: "학교/학원에서 예수님을 어떻게 자랑할 것인가?<br>(나만의 영적 펀치라인 쓰기)",
-            placeholder: "예: 세상이 날 비웃어도 내 진짜 주인은 Jesus! / 급식실 기도, 눈치 안 보고 내 믿음을 증명해!",
+            html: `
+                <label>학교/학원에서 예수님을 어떻게 자랑할 것인가?<br>(나만의 영적 펀치라인 쓰기)</label>
+                <textarea id="w2-input" rows="4" placeholder="예: 세상이 날 비웃어도 내 진짜 주인은 Jesus!"></textarea>
+            `,
             btnText: "진짜 힙합 선포하기 🎤",
-            btnColor: "var(--accent-w2)",
-            resultTitle: "나의 리얼 힙합 펀치라인 💥",
-            resultColor: "#fef08a",
-            tabClass: "active-w2"
+            btnColor: "var(--accent-w2)"
+        },
+        3: {
+            storageKey: "spiritual_logs_week3",
+            html: `
+                <label style="color:#fca5a5;">🚫 세상 계정 (로그아웃 할 생각)</label>
+                <textarea id="w3-logout" rows="2" placeholder="예: 남들과 비교하는 마음, 스마트폰 중독"></textarea>
+                <div style="text-align:center; font-size:1.5rem; margin: 5px 0;">⬇️</div>
+                <label style="color:#8b5cf6;">✝️ 예수님 계정 (로그인 할 마음)</label>
+                <textarea id="w3-login" rows="2" placeholder="예: 나는 하나님의 VIP라는 확신, 수련회의 기대감"></textarea>
+            `,
+            btnText: "🔄 계정 전환 (로그인) 완료!",
+            btnColor: "linear-gradient(45deg, #8b5cf6, #ec4899)", // 인스타 느낌의 그라데이션
+            resultTitle: "나의 영적 프로필 전환 완료 📱"
         }
     };
 
@@ -130,44 +149,57 @@
         currentWeek = week;
         const config = weekConfig[week];
 
+        // 탭 디자인 변경
         document.getElementById("tab-1").className = "tab";
         document.getElementById("tab-2").className = "tab";
-        document.getElementById("tab-" + week).classList.add(config.tabClass);
+        document.getElementById("tab-3").className = "tab";
+        document.getElementById("tab-" + week).classList.add("active-w" + week);
 
-        document.getElementById("question-label").innerHTML = config.question;
-        document.getElementById("answer-input").placeholder = config.placeholder;
-        document.getElementById("answer-input").value = "";
+        // 입력 폼 삽입
+        document.getElementById("dynamic-form-group").innerHTML = config.html;
         
+        // 버튼 스타일
         const actionBtn = document.getElementById("action-btn");
         actionBtn.innerText = config.btnText;
-        actionBtn.style.backgroundColor = config.btnColor;
+        actionBtn.style.background = config.btnColor;
         actionBtn.style.color = week === 2 ? "#1e293b" : "white"; 
 
         loadLogs();
     }
 
     function saveLog() {
-        const detail = document.getElementById("answer-input").value.trim();
-        if(!detail) {
-            alert("내용을 입력해주세요!");
-            return;
+        const config = weekConfig[currentWeek];
+        let logDetail = {};
+
+        if (currentWeek === 1) {
+            const val = document.getElementById("w1-input").value.trim();
+            if(!val) { alert("내용을 입력해주세요!"); return; }
+            logDetail = { type: 'single', text: val };
+        } else if (currentWeek === 2) {
+            const val = document.getElementById("w2-input").value.trim();
+            if(!val) { alert("내용을 입력해주세요!"); return; }
+            logDetail = { type: 'single', text: val };
+        } else if (currentWeek === 3) {
+            const logoutVal = document.getElementById("w3-logout").value.trim();
+            const loginVal = document.getElementById("w3-login").value.trim();
+            if(!logoutVal || !loginVal) { alert("로그아웃 할 생각과 로그인 할 마음을 모두 적어주세요!"); return; }
+            logDetail = { type: 'double', logoutText: logoutVal, loginText: loginVal };
         }
 
-        const config = weekConfig[currentWeek];
         const logContainer = JSON.parse(localStorage.getItem(config.storageKey) || "[]");
-        
         const filteredContainer = logContainer.filter(log => log.user !== currentUser);
+        
         const newLog = {
             user: currentUser,
-            detail: detail,
+            detail: logDetail,
             date: new Date().toLocaleString('ko-KR')
         };
         
         filteredContainer.push(newLog);
         localStorage.setItem(config.storageKey, JSON.stringify(filteredContainer));
         
-        document.getElementById("answer-input").value = "";
-        alert(currentWeek === 2 ? "영적 펀치라인 장착 완료! 세상에 플렉스 하세요!" : "생각을 포획했습니다!");
+        selectWeek(currentWeek); // 입력창 초기화 및 새로고침 효과
+        alert(currentWeek === 3 ? "예수님 계정으로 성공적으로 로그인되었습니다!" : "저장되었습니다!");
         loadLogs();
     }
 
@@ -184,13 +216,27 @@
             return;
         }
 
+        let contentHtml = "";
+        if (userLog.detail.type === 'single') {
+            const textColor = currentWeek === 1 ? "#fca5a5" : "#fef08a";
+            contentHtml = `<div style="margin-top:10px; font-size: 1.1rem; font-weight: bold; color:${textColor};">${userLog.detail.text}</div>`;
+        } else if (userLog.detail.type === 'double') {
+            contentHtml = `
+                <div style="margin-top:10px;">
+                    <div class="logout-text">🚫 로그아웃 완료: ${userLog.detail.logoutText}</div>
+                    <div class="login-text">✨ 로그인 완료: ${userLog.detail.loginText}</div>
+                </div>
+            `;
+        }
+
         const item = document.createElement("div");
         item.className = "log-box";
-        item.style.borderLeftColor = config.btnColor;
+        // 3주 차는 테두리 선도 보라색 계열로
+        item.style.borderLeft = `4px solid ${currentWeek === 3 ? "var(--accent-w3)" : (currentWeek === 1 ? "var(--accent-w1)" : "var(--accent-w2)")}`;
         item.innerHTML = `
-            <div class="log-date">선포 시간: ${userLog.date}</div>
-            <div><strong>${config.resultTitle}</strong></div>
-            <div style="margin-top:10px; font-size: 1.1rem; font-weight: bold; color:${config.resultColor};">${userLog.detail}</div>
+            <div class="log-date">전환 시간: ${userLog.date}</div>
+            <div><strong>${config.resultTitle || ''}</strong></div>
+            ${contentHtml}
         `;
         containerHtml.appendChild(item);
     }
